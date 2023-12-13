@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flight ✈ Diary</title>
+    <link rel="stylesheet" href="./app.css" />
+    <script src="./app.js" defer type="module"></script>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <span class="header">Flight <span class="circle">✈</span> Diary</span>
+        <button id="new-flight">+ Flight</button>
+      </div>
+    </header>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search..." id="search"/>
+    </div>
+
+    <main>
+      <section id="default-text" class="card">
+        <p>Your Flights in the spotlight!</p>
+      </section>
+      <ul id="flight-list">
+      </ul>
+    </main>
+
+    <div class="modal" id="add-modal">
+      <div class="modal__content">
+        <label for="flight-num">Flight number</label>
+        <input type="text" name="flight-num" id="fligh-tnum" />
+        <label for="departure">Departure</label>
+        <input type="text" name="departure" id="departure" />
+        <label for="arrival">Arrival</label>
+        <input type="text" name="arrival" id="arrival" />
+        <label for="date">Date</label>
+        <input type="date" name="date" id="date" />
+        <label for="image-url">Image URL</label>
+        <input type="text" name="image-url" id="image-url" />
+        <label for="misc-notes">Notes</label>
+        <input name="misc-notes" id="misc-notes">
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--passive" id="cancel-flight">Cancel</button>
+        <button class="btn btn--success" id="add-flight">Add</button>
+      </div>
+    </div>
+    <div id="backdrop"></div>
+
+  </body>
+</html>
