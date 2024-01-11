@@ -93,7 +93,7 @@ const renderNewFlightElement = (flightElement) => {
     // to put the values of variables in it
     newFlightElement.innerHTML = `
         <div class="flight-element__image">
-            <img src="${flightElement.imageUrl}" alt="Finnair">
+            <img src="${flightElement.imageUrl}" alt="Plane image">
         </div>
         <div class="flight-element__info">
             <h2>${flightElement.flightNumber}</h2>
