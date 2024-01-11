@@ -1,3 +1,6 @@
+// import the cookie handler methods from the other js file
+import { setCookie, getCookie } from "./cookies.js";
+
 // getting a reference to all the elements from the DOM
 const startAddFlightButton = document.querySelector("#new-flight");
 
@@ -8,10 +11,23 @@ const cancelAddFlightButton = addFlightModal.querySelector("#cancel-flight");
 
 const confirmAddFlightButton = document.querySelector("#add-flight");
 
+const defaultTextSection = document.querySelector("#default-text");
+
 const listRoot = document.getElementById("flight-list");
 
 // the array where the elements added will be stored
 let flights = [];
+
+// based on whether there are flights added (and displayed), so by checking the flights array's size
+// we either show or hide the default placeholder text
+const updateUI = () => {
+    if (flights.length === 0) {
+        defaultTextSection.style.display = 'block';
+    } else {
+        defaultTextSection.style.display = 'none';
+    }
+}
+
 
 // function that toggles the visibility of both the popup modal and its backdrop
 // we use the toggle function of javascript to avoid having to write an if-else construct doing the same
@@ -32,6 +48,36 @@ const clearFlightInput = () => {
 const cancelAddFlightHandler = () => {
     toggleFlightModal();
     clearFlightInput();
+}
+
+// to delete a flight we either manually iterate through the flights[] array
+// and remove it using the splice function
+// or use the more modern 'filter' method of javascript. filter keeps only the elements passing the "test"
+// in the array. in our case elements whose flightid do NOT match what we are searching for
+// in turn the flight we were looking for is removed from the array if exists.
+// ---
+// to remove the element from the DOM, with the first option we can use its position (index) to do so
+// otherwise we can use the querySelector searching for the flight's id, then remove it
+// `` marks an interpolated string which consists of a "#" character + with the use of the ${variable} syntax, javascript interpolates
+// the value of the variable there
+const deleteFlightHandler = (flightId) => {
+    // let flightIndex;
+    // for(let i=0;i<flights.length;i++) {
+    //     if(flights[i].id === flightId) {
+    //         flightIndex = i;
+    //         break;
+    //     }
+    // }
+    // flights.splice(flightIndex,1);
+    // listRoot.children[flightIndex].remove();
+    flights = flights.filter(flight => flight.id !== flightId);
+    listRoot.querySelector(`#${flightId}`).remove();
+
+    // every time we delete a flight, we save the whole flights array either to a cookie or to the local (or session) storage to persist it through reloads and reopens
+    setCookie("flightdiary",JSON.stringify(flights),365);    
+    //localStorage.setItem("flightDiary",JSON.stringify(flights));
+
+    updateUI();
 }
 
 // renders (displays in the browser in the DOM) a new element
@@ -57,6 +103,9 @@ const renderNewFlightElement = (flightElement) => {
         </div>
     `;
 
+    //newFlightElement.addEventListener('click', ()=>deleteFlightHandler(flightElement.id));
+    newFlightElement.addEventListener('click', deleteFlightHandler.bind(null,flightElement.id));
+
     //finally, the element is added to the DOM at the end of the element we named above as "listRoot"
     listRoot.append(newFlightElement);
 }
@@ -74,7 +123,8 @@ const addFlightHandler = () => {
     const imageUrlValue = userInputs[4].value;
     const miscNotesValue = document.querySelector("#misc-notes").value;
 
-    // we can do validation here
+    // we can do validation here if we want to
+    // if(...)
 
     // add a new object with the required values
     // the "crypto.randomUUID" function at the top concatenated to the string "id"
@@ -96,13 +146,65 @@ const addFlightHandler = () => {
     // add the new object to an array
     flights.push(newFlight);
 
+    // every time we add a new a flight, we save the whole flights array either to a cookie or to the local (or session) storage to persist it through reloads and reopens
+    setCookie("flightdiary",JSON.stringify(flights),365);
+    //localStorage.setItem("flightDiary",JSON.stringify(flights));
+
     // pass it to the function that displays it
     renderNewFlightElement(newFlight);
 
     // hide the modal and the backdrop and clear the modal inputs
     toggleFlightModal();
     clearFlightInput();
+    updateUI();
 }
+
+// this event listeners is attached to the search input field and fires every time a character is entered
+// event.target.value in turn always contains the exact string that is in the input field, and that is what we are searching for in the "h2" of the flight-elements
+// both of which we grab with further querySelectors
+// the flightElements array is actually grabbed with the querySelectorAll function as it is potentially a list of 0,1 or more elements.
+document.querySelector('#search').addEventListener('input', (event) => {
+    const searchText = event.target.value;
+    const flightElements = listRoot.querySelectorAll('.flight-element');
+
+    for(const flightElement of flightElements) {
+        const flightNumber = flightElement.querySelector('h2').innerText;
+        // for example. if the flight number is AY1251, then "AY" is a match, or "25" is a match
+        // so we don't check strict equality between the search text and the flight number. rather if the flight number contains the searched text anywhere
+        // (as a "substring"), we consider it a match and keep that flight element displayed. otherwise we hide it by settings its display property to none
+        // if the input field is empty "", it is contained by any and every element, so everything will be displayed as expected
+        if( flightNumber.toLowerCase().includes(searchText.toLowerCase()) ) {
+            flightElement.style.display = 'flex';
+        } else {
+            flightElement.style.display = 'none';
+        }
+    }
+});
+
+// when the page is loaded, retrieve all saved flights from the cookies (if it exists and is non-empty)
+// and consequently add them to the flights[] array as well as display them
+// or do the same from the local/(session) storage
+window.addEventListener('load',()=>{
+    const cookie = getCookie("flightdiary");
+    if(cookie) {
+        const cookieFlights = JSON.parse(cookie);
+        for(const flight of cookieFlights) {
+            flights.push(flight);
+            renderNewFlightElement(flight);
+        }
+    }
+
+    // const storedFlights = localStorage.getItem("flightDiary");
+    // if(storedFlights) {
+    //     const storedFlightObjects = JSON.parse(storedFlights);
+    //     for(const flight of storedFlightObjects) {
+    //         flights.push(flight);
+    //         renderNewFlightElement(flight);
+    //     }
+    // }
+
+    updateUI();
+})
 
 // register all the functions declared above to event listeners
 startAddFlightButton.addEventListener("click",toggleFlightModal);
