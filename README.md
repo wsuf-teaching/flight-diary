@@ -20,6 +20,9 @@ The following snippet will be needed in a function, you can copy it from here:
 
 > If you replace the arrow function notations `() => {}` with the regular function declaration syntax (`function() {}`) then the order of functions in `app.js` will no longer matter.
 
+<hr/>
+<hr/>
+
 ## Local python server included
 It helps test the "add example flights" button.
 To make the included `server.py` work, follow the steps below:
@@ -56,7 +59,7 @@ In a command line, type the following command:
 python .\server.py
 ```
 
-This small server by default will run on port 5000. Therefore its full address will be either `localhost:5000` or `127.0.0.1:5000`. 
-Finally, as the endpoint defined in the server is `/test_flights`, the actual endpoint you will have to send a request from your own form running through the Live server will be `http://127.0.0.1:5000/test_flights`
+This small server by default will run on port 5000. Therefore its full address will be either `http://localhost:5000` or `http://127.0.0.1:5000`. 
+Finally, as the endpoint defined in the server is `/test_flights`, the actual endpoint you will have to send a request from your fetch call (as it is included in the .js code) will be `http://127.0.0.1:5000/test_flights`
 
 > You can stop the small server by pressing CTRL+C on your keyboard while in the terminal or simply by closing the terminal window.
