@@ -244,6 +244,7 @@ input, textarea {
   max-width: 90%;
   margin: 1rem auto;
   padding: 0;
+  padding-bottom: 2rem;
 }
 
 
@@ -260,4 +261,30 @@ input, textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
   margin: 1.5rem 0 0.5rem 0;
+}
+
+footer {
+  position: fixed;
+  bottom: 0px;
+  background: #463f6b;
+  padding: .5rem .5rem;
+  width: 100%;
+  text-align: center;
+}
+footer button {
+  font: inherit;
+  padding: .5rem .5rem;
+  background: #3672ff;
+  border: 1px solid #b4daff;
+  color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.26);
+  cursor: pointer;
+  margin: auto;
+}
+
+
+footer button:hover,
+footer button:active {
+  background: #2264ff;
 }

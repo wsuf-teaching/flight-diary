@@ -13,6 +13,8 @@ const confirmAddFlightButton = document.querySelector("#add-flight");
 
 const defaultTextSection = document.querySelector("#default-text");
 
+const exampleFlightsButton = document.querySelector("#example-flight");
+
 const listRoot = document.getElementById("flight-list");
 
 // the array where the elements added will be stored
@@ -181,6 +183,53 @@ document.querySelector('#search').addEventListener('input', (event) => {
     }
 });
 
+// a new event handler function that we attach to the button added newly to the bottom of the page
+// that part should be fairly straightforward....
+const fetchExampleFlights = () => {
+
+    // we try to get the data on the URL supplied
+    // fetch returns a "Promise" that will resolve (resolve, on success) to the response of that request
+    // or otherwise fail (reject)
+    fetch("http://127.0.0.1:5000/test_flights")
+        // if the call was successful (in a sense that the server returned "something" - doesn't mean that something good)
+        // then the response object will be returned (the body which is a stream object) that is "big"
+        .then(response => {
+            // it is a good practice to here also check the status of the response, whether it
+            // indeed indicates a success (either response.ok or response.status being 2xx [200])
+            if (!response.ok ) {
+                // in that case, we can reject this promise (thus jumping to the catch block)
+                return Promise.reject(`HTTP error! Status: ${response.status}`);
+            }
+            // if the status code is ok
+            // we can process its body once again asynchronously
+            // of course we can do it manually (see this doc: https://developer.mozilla.org/en-US/docs/Web/API/Response/body)
+            // but as we usually work with json data in websites, the .json() function does this for us
+            // treating and converting the response data to json
+            // in a successful operation we can just return the value we want to, as it being
+            // "resolve" is implicitly agreed on
+            // this would mean the same: return Promise.resolve(response.json());
+            return response.json();
+         } )
+        // then (if the response was ok AND the json conversion was successful as well)
+        // we get an array of (json) objects, that we can treat it as a regular javascript array
+        // so from now on, we just do stuff we did before plenty of times, adding it to the DOM and things
+        .then(exampleFlights => {
+            flights = exampleFlights;
+            listRoot.innerHTML = '';
+            for(let exampleFlight of exampleFlights) {
+                renderNewFlightElement(exampleFlight);
+            }
+            setCookie('flightdiary', JSON.stringify(flights),365);
+        })
+        // if any of the promises (including the fetch call and the 
+        // then blocks as they are promises themselves) fail
+        // we catch and print out the errors here
+        .catch(err => console.log('Fetch error', err))
+        // the finally block executes either way, both in a success or a failure case
+        .finally(()=>{console.log('finally')});
+
+};
+
 // when the page is loaded, retrieve all saved flights from the cookies (if it exists and is non-empty)
 // and consequently add them to the flights[] array as well as display them
 // or do the same from the local/(session) storage
@@ -214,3 +263,10 @@ backdrop.addEventListener("click",cancelAddFlightHandler);
 cancelAddFlightButton.addEventListener("click",cancelAddFlightHandler);
 
 confirmAddFlightButton.addEventListener("click",addFlightHandler);
+
+exampleFlightsButton.addEventListener("click", fetchExampleFlights);
+
+
+
+
+
